@@ -17,9 +17,11 @@ pragma solidity ^0.8.9;
         its details or loop through and filter between paid and unpaid tickets (using the license plates)
  */
 
+error Ledger__NotPermitted();
+
 contract Ledger {
     // Set the admin default address
-    address private i_admin;
+    address private immutable i_admin;
 
     // Create the ticket issuing object
     struct Ticket {
@@ -31,11 +33,31 @@ contract Ledger {
     }
 
     // All Tickets array
-    Ticket[] private tickets;
+    Ticket[] private s_tickets;
+
+    // Events
+    event NewTicketIssued(string indexed carPlate, string indexed location);
 
     // Constructor
     constructor() {
         i_admin = msg.sender;
+    }
+
+    function createTicket(
+        string memory enteredLocation,
+        string memory carPlate,
+        uint256 tixPrice
+    ) public {
+        if (msg.sender != i_admin) {
+            revert Ledger__NotPermitted();
+        }
+
+        // Create a new Ticket obj
+        s_tickets.push(
+            Ticket(enteredLocation, carPlate, tixPrice, block.timestamp, false)
+        );
+
+        emit NewTicketIssued(carPlate, enteredLocation);
     }
 
     // View functions
@@ -45,6 +67,6 @@ contract Ledger {
 
     // get all tickets obj
     function getAllTickets() public view returns (Ticket[] memory) {
-        return tickets;
+        return s_tickets;
     }
 }
