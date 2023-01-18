@@ -68,5 +68,17 @@ describe('Ledger', function () {
       const tickets = await ledgerContract.getAllTickets()
       assert.isArray(tickets)
     })
+
+    it('Should fire a New Ticket event when a new ticket is created', async function () {
+      await expect(
+        ledgerContract.createTicket(
+          TicketObj.location,
+          TicketObj.carPlate,
+          TicketObj.price
+        )
+      )
+        .to.emit(ledgerContract, NewTicketIssued)
+        .withArgs(carPlate, enteredLocation)
+    })
   })
 })
