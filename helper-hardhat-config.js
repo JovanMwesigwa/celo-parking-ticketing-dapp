@@ -7,6 +7,14 @@ const TicketObj = {
   isPaid: false,
 }
 
+const TicketObjTwo = {
+  location: 'Kireka',
+  carPlate: 'UBV-735-K',
+  price: ethers.utils.parseEther('0.025'),
+  isPaid: false,
+}
+
 module.exports = {
   TicketObj,
+  TicketObjTwo,
 }
