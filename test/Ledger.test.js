@@ -112,7 +112,6 @@ describe('Ledger', function () {
 
       // get ticket
       const result = await ledgerContract.getTicketInfo('1')
-      console.log(result)
       assert.isArray(result)
     })
   })
