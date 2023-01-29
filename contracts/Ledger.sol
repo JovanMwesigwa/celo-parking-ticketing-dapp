@@ -1,21 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.7;
 
-// Uncomment this line to use console.log
-import 'hardhat/console.sol';
-/*
-    1. We need an admin address to issue a new ticket
-    2. Ticket object should have - {
-        price,
-        date created,
-        car number plate,
-        is paid -- (bool)
-    }
-    3. Anyone can pay for the ticket on the owner's behalf
+// 1. We need an admin address to issue a new ticket
+// 2. Ticket object should have - {
+//     price,
+//     date created,
+//     car number plate,
+//     is paid -- (bool)
+// }
+// 3. Anyone can pay for the ticket on the owner's behalf
 
-    NB: The car's license plate is very important because we may need to query 
-        its details or loop through and filter between paid and unpaid tickets (using the license plates)
- */
+// NB: The car's license plate is very important because we may need to query
+//     its details or loop through and filter between paid and unpaid tickets (using the license plates)
 
 error Ledger__NotPermitted();
 error Ledger__NotEnoughFundsPaid();
@@ -123,8 +119,21 @@ contract Ledger {
         vehicleTicket.isPaid = true;
 
         // Change the isPaid status to true in the all s_tickets array
+        // Ticket memory fromAllTix = s_tickets[ticketNo];
+        // fromAllTix.isPaid = true;
         Ticket memory fromAllTix = s_tickets[ticketNo];
-        fromAllTix.isPaid = true;
+        delete s_tickets[ticketNo];
+
+        s_tickets.push(
+            Ticket(
+                fromAllTix.ticketNumber,
+                fromAllTix.location,
+                fromAllTix.carNumberPlate,
+                fromAllTix.price,
+                fromAllTix.issuedAt,
+                true
+            )
+        );
 
         // Change in the vehicleTicket isPaid to true
         s_vehicleTickets[carPlate][ticketNo].isPaid = true;

@@ -1,7 +1,7 @@
 import TicketCard from './TicketCard'
 import tickets from '../../../data/data'
 
-const AllTickets = ({ position, selectTicket }) => {
+const AllTickets = ({ position, selectTicket, tickets }) => {
   return (
     <div
       className={`flex w-full flex-col items-center rounded-lg ${
@@ -19,8 +19,8 @@ const AllTickets = ({ position, selectTicket }) => {
         {tickets.map((item) => (
           <TicketCard
             selectTicket={selectTicket}
-            key={item.ticketNumber}
-            cleared={item.isPaid}
+            key={item['ticketNumber'].toString()}
+            cleared={item['isPaid']}
             item={item}
           />
         ))}

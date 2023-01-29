@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/Ledger.sol": {
+      "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.9;\r\n\r\n// 1. We need an admin address to issue a new ticket\r\n// 2. Ticket object should have - {\r\n//     price,\r\n//     date created,\r\n//     car number plate,\r\n//     is paid -- (bool)\r\n// }\r\n// 3. Anyone can pay for the ticket on the owner's behalf\r\n\r\n// NB: The car's license plate is very important because we may need to query\r\n//     its details or loop through and filter between paid and unpaid tickets (using the license plates)\r\n\r\nerror Ledger__NotPermitted();\r\nerror Ledger__NotEnoughFundsPaid();\r\n\r\ncontract Ledger {\r\n    // Set the admin default address\r\n    address private immutable i_admin;\r\n    uint256 private s_ticketCount;\r\n    uint256 private s_ledgerBalance;\r\n\r\n    // Create the ticket issuing object\r\n    struct Ticket {\r\n        uint256 ticketNumber;\r\n        string location;\r\n        string carNumberPlate;\r\n        uint256 price;\r\n        uint256 issuedAt;\r\n        bool isPaid;\r\n    }\r\n\r\n    // All Tickets array\r\n    Ticket[] private s_tickets;\r\n\r\n    mapping(string => Ticket[]) private s_vehicleTickets;\r\n    mapping(string => Ticket[]) private s_vehicleUpaidTickets;\r\n    mapping(string => Ticket[]) private s_vehiclePaidTickets;\r\n\r\n    // Events\r\n    event NewTicketIssued(string indexed carPlate, string indexed location);\r\n    event TicketPaid(uint256 indexed ticketNumber, string indexed carPlate);\r\n\r\n    // Constructor\r\n    constructor() {\r\n        i_admin = msg.sender;\r\n        s_ticketCount = 0;\r\n        s_ledgerBalance = 0;\r\n    }\r\n\r\n    function createTicket(\r\n        string memory enteredLocation,\r\n        string memory carPlate,\r\n        uint256 tixPrice\r\n    ) public {\r\n        if (msg.sender != i_admin) {\r\n            revert Ledger__NotPermitted();\r\n        }\r\n\r\n        // Create a new Ticket obj\r\n        s_tickets.push(\r\n            Ticket(\r\n                s_ticketCount,\r\n                enteredLocation,\r\n                carPlate,\r\n                tixPrice,\r\n                block.timestamp,\r\n                false\r\n            )\r\n        );\r\n\r\n        s_vehicleTickets[carPlate].push(\r\n            Ticket(\r\n                s_ticketCount,\r\n                enteredLocation,\r\n                carPlate,\r\n                tixPrice,\r\n                block.timestamp,\r\n                false\r\n            )\r\n        );\r\n\r\n        s_vehicleUpaidTickets[carPlate].push(\r\n            Ticket(\r\n                s_ticketCount,\r\n                enteredLocation,\r\n                carPlate,\r\n                tixPrice,\r\n                block.timestamp,\r\n                false\r\n            )\r\n        );\r\n\r\n        s_ticketCount += 1;\r\n\r\n        // add the vehicle to the s_vehicleTicket mapping\r\n        emit NewTicketIssued(carPlate, enteredLocation);\r\n    }\r\n\r\n    function payTicket(\r\n        string memory carPlate,\r\n        uint256 ticketNo\r\n    ) public payable {\r\n        // Get the required ticket\r\n        Ticket memory vehicleTicket = s_vehicleTickets[carPlate][ticketNo];\r\n        uint256 tixPrice = vehicleTicket.price;\r\n\r\n        // Verify to see that they'repaying the right ticket amount\r\n        if (msg.value < tixPrice) {\r\n            revert Ledger__NotEnoughFundsPaid();\r\n        }\r\n\r\n        // Update the contract balances\r\n        s_ledgerBalance += msg.value;\r\n\r\n        // Change the in memory vehicleTicket is Paid to true\r\n        vehicleTicket.isPaid = true;\r\n\r\n        // Change the isPaid status to true in the all s_tickets array\r\n        Ticket memory fromAllTix = s_tickets[ticketNo];\r\n        fromAllTix.isPaid = true;\r\n\r\n        // Change in the vehicleTicket isPaid to true\r\n        s_vehicleTickets[carPlate][ticketNo].isPaid = true;\r\n\r\n        // Clear / Remove the ticket from the vehicle's unpaid tickets\r\n        delete s_vehicleUpaidTickets[carPlate][ticketNo];\r\n\r\n        // Add it to the paid tickets array;\r\n        s_vehiclePaidTickets[carPlate].push(vehicleTicket);\r\n\r\n        // Emit event to show a new ticket paid..\r\n        emit TicketPaid(ticketNo, carPlate);\r\n    }\r\n\r\n    // View functions\r\n    function getAdminAddress() public view returns (address) {\r\n        return i_admin;\r\n    }\r\n\r\n    // get all tickets obj\r\n    function getAllTickets() public view returns (Ticket[] memory) {\r\n        return s_tickets;\r\n    }\r\n\r\n    function getTicketInfo(\r\n        uint256 ticketNo\r\n    ) public view returns (Ticket memory) {\r\n        // return s_vehicleUpaidTickets[carPlate][ticketNo];\r\n        return s_tickets[ticketNo];\r\n    }\r\n\r\n    // Get vehicle tickets\r\n    function getVehicleTickets(\r\n        string memory carPlate\r\n    ) public view returns (Ticket[] memory) {\r\n        return s_vehicleTickets[carPlate];\r\n    }\r\n\r\n    function getVehicleUnPaidTickets(\r\n        string memory carPlate\r\n    ) public view returns (Ticket[] memory) {\r\n        return s_vehicleUpaidTickets[carPlate];\r\n    }\r\n\r\n    function getVehiclePaidTickets(\r\n        string memory carPlate\r\n    ) public view returns (Ticket[] memory) {\r\n        return s_vehiclePaidTickets[carPlate];\r\n    }\r\n}\r\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

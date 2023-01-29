@@ -3,6 +3,9 @@ import LiveIcon from '../../../public/assets/live.json'
 import doneIcon from '../../../public/assets/done.json'
 
 const TicketCard = ({ item, cleared, selectTicket }) => {
+  if (!item['carNumberPlate']) {
+    return null
+  }
   return (
     <div
       onClick={() => selectTicket(item)}
@@ -10,17 +13,21 @@ const TicketCard = ({ item, cleared, selectTicket }) => {
     >
       <div className="flex flex-col">
         <h1 className="text-white text-sm font-medium">
-          Tix No: {item.ticketNumber}
+          Tix No: {item['ticketNumber'].toString()}
         </h1>
-        <p className="text-gray-400 text-xs font-thin">{item.issuedAt}</p>
-      </div>
-      <div className="flex flex-col">
-        <h1 className="text-white text-sm font-medium">${item.price}</h1>
-        <p className="text-gray-400 text-xs font-thin">{item.location}</p>
+        <p className="text-gray-400 text-xs font-thin">
+          {item['issuedAt'].toString()}
+        </p>
       </div>
       <div className="flex flex-col">
         <h1 className="text-white text-sm font-medium">
-          {item.carNumberPlate}
+          ${item['price'].toString()}
+        </h1>
+        <p className="text-gray-400 text-xs font-thin">{item['location']}</p>
+      </div>
+      <div className="flex flex-col">
+        <h1 className="text-white text-sm font-medium">
+          {item['carNumberPlate']}
         </h1>
         <div className="flex flex-row items-center justify-between">
           {cleared ? (

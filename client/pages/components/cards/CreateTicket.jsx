@@ -1,4 +1,47 @@
-const CreateTicket = ({ position }) => {
+import { useState } from 'react'
+import { ABI, CONTRACT_ADDRESS } from '../../../constants'
+import { useWeb3Contract } from 'react-moralis'
+import { ethers } from 'ethers'
+
+const CreateTicket = ({ position, reload }) => {
+  const [carPlate, setCarPlate] = useState('')
+  const [location, setLocation] = useState('')
+  const [price, setPrice] = useState('')
+
+  const {
+    runContractFunction: create,
+    data: enterTxResponse,
+    isLoading,
+    isFetching,
+    error,
+  } = useWeb3Contract({
+    abi: ABI,
+    contractAddress: CONTRACT_ADDRESS,
+    functionName: 'createTicket',
+    params: {
+      enteredLocation: location,
+      carPlate: carPlate,
+      // tixPrice: ethers.utils.parseEther(price.toString()),
+      tixPrice: price,
+    },
+  })
+
+  const confirm = async () => {
+    try {
+      if (!carPlate || !location || !price) {
+        alert('Some fields missing')
+      }
+
+      await create()
+      await reload()
+      setCarPlate('')
+      setLocation('')
+      setPrice('')
+    } catch (err) {
+      console.log(error)
+    }
+  }
+
   return (
     <div
       className={`flex w-full flex-col items-center rounded-lg ${
@@ -16,6 +59,8 @@ const CreateTicket = ({ position }) => {
           </label>
           <input
             type="text"
+            value={carPlate}
+            onChange={(e) => setCarPlate(e.target.value)}
             className="outline-none p-3 rounded-md bg-lightBg text-white"
           />
         </div>
@@ -26,6 +71,8 @@ const CreateTicket = ({ position }) => {
             Location
           </label>
           <input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
             type="text"
             className="outline-none p-3 rounded-md bg-lightBg text-white"
           />
@@ -38,6 +85,8 @@ const CreateTicket = ({ position }) => {
           </label>
           <input
             type="text"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
             className="outline-none p-3 rounded-md bg-lightBg text-white"
           />
         </div>
@@ -45,8 +94,10 @@ const CreateTicket = ({ position }) => {
         <button
           type="submit"
           className="w-full p-3 my-3 bg-blue-600 text-white rounded-md"
+          onClick={confirm}
+          disabled={isLoading || isFetching}
         >
-          Create
+          {isLoading || isFetching ? 'Loading' : 'Create'}
         </button>
         {/*  */}
       </div>

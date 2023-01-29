@@ -1,4 +1,31 @@
+import { ABI, CONTRACT_ADDRESS } from '../../../constants'
+import { useWeb3Contract } from 'react-moralis'
+
 const TicketDetail = ({ position, ticket }) => {
+  const {
+    runContractFunction: payTicket,
+    data: enterTxResponse,
+    isLoading,
+    isFetching,
+    error,
+  } = useWeb3Contract({
+    abi: ABI,
+    contractAddress: CONTRACT_ADDRESS,
+    functionName: 'payTicket',
+    params: {
+      carPlate: ticket['carNumberPlate'].toString(),
+      ticketNo: Number(ticket['ticketNumber'].toString()),
+    },
+    msgValue: Number(ticket['price'].toString()),
+  })
+
+  const confirm = async () => {
+    try {
+      await payTicket()
+    } catch (err) {
+      console.log(error)
+    }
+  }
   return (
     <div
       className={`flex w-full flex-col items-center rounded-lg ${
@@ -16,30 +43,36 @@ const TicketDetail = ({ position, ticket }) => {
           <h3 className="text-sm font-medium">
             Ticket No:{' '}
             <span className="text-lg font-medium ml-2">
-              {ticket.ticketNumber}
+              {ticket['ticketNumber'].toString()}
             </span>
           </h3>
 
           <h3 className="text-sm font-medium">
             Vehicle Plate:{' '}
             <span className="text-lg font-medium ml-2">
-              {ticket.carNumberPlate}
+              {ticket['carNumberPlate']}
             </span>
           </h3>
 
           <h3 className="text-sm font-medium">
             Location:{' '}
-            <span className="text-lg font-medium ml-2">{ticket.location}</span>
+            <span className="text-lg font-medium ml-2">
+              {ticket['location']}
+            </span>
           </h3>
 
           <h3 className="text-sm font-medium">
             Price:{' '}
-            <span className="text-lg font-medium ml-2">${ticket.price}</span>
+            <span className="text-lg font-medium ml-2">
+              ${ticket['price'].toString()}
+            </span>
           </h3>
 
           <h3 className="text-sm font-medium">
             Date:{' '}
-            <span className="text-lg font-medium ml-2">{ticket.issuedAt}</span>
+            <span className="text-lg font-medium ml-2">
+              {ticket['issuedAt'].toString()}
+            </span>
           </h3>
 
           <h3 className="text-sm font-medium">
@@ -49,9 +82,11 @@ const TicketDetail = ({ position, ticket }) => {
         </div>
         <div className="w-full h-1 bg-lightBg my-6"></div>
 
-        {!ticket.isPaid && (
+        {!ticket['isPaid'] && (
           <div className="flex  flex-col justify-center ">
-            <button className="p-3 bg-blue-600 rounded-full">PAY</button>
+            <button onClick={confirm} className="p-3 bg-blue-600 rounded-full">
+              PAY
+            </button>
           </div>
         )}
       </div>

@@ -21,10 +21,28 @@ module.exports = {
       chainId: 44787,
     },
   },
-  solidity: '0.8.17',
+  solidity: {
+    compilers: [
+      {
+        version: '0.8.17',
+      },
+      {
+        version: '0.8.7',
+      },
+      {
+        version: '0.8.9',
+      },
+    ],
+  },
   namedAccounts: {
     deployer: {
       default: 0,
     },
+  },
+  paths: {
+    artifacts: './client/backend',
+  },
+  mocha: {
+    timeout: 500000, // 500 seconds max for running tests
   },
 }

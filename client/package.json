@@ -12,6 +12,7 @@
     "@next/font": "13.1.5",
     "@web3uikit/core": "^0.2.45",
     "@web3uikit/web3": "^0.2.2",
+    "ethers": "^5.7.2",
     "lottie-react": "^2.3.1",
     "magic-sdk": "^13.1.0",
     "moralis-v1": "^1.12.0",
