@@ -13,6 +13,9 @@ const MainLayout = dynamic(() => import('./components/MainLayout'))
 export default function Home() {
   const [tickets, setTickets] = useState([])
   const { isWeb3Enabled, Moralis, account } = useMoralis()
+  const [adminAddress, setAdminAddress] = useState(
+    '0x5cbdf5f9e468df3888e04155668ccafc6f6c4dcf'
+  )
 
   const [selectedTicket, setSelectedTicket] = useState(null)
 

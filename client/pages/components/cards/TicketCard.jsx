@@ -3,9 +3,6 @@ import LiveIcon from '../../../public/assets/live.json'
 import doneIcon from '../../../public/assets/done.json'
 
 const TicketCard = ({ item, cleared, selectTicket }) => {
-  if (!item['carNumberPlate']) {
-    return null
-  }
   return (
     <div
       onClick={() => selectTicket(item)}

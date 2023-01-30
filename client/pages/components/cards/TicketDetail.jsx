@@ -4,7 +4,6 @@ import { useWeb3Contract } from 'react-moralis'
 const TicketDetail = ({ position, ticket }) => {
   const {
     runContractFunction: payTicket,
-    data: enterTxResponse,
     isLoading,
     isFetching,
     error,
@@ -26,6 +25,8 @@ const TicketDetail = ({ position, ticket }) => {
       console.log(error)
     }
   }
+
+  // console.log(error)
   return (
     <div
       className={`flex w-full flex-col items-center rounded-lg ${

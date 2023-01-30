@@ -119,21 +119,8 @@ contract Ledger {
         vehicleTicket.isPaid = true;
 
         // Change the isPaid status to true in the all s_tickets array
-        // Ticket memory fromAllTix = s_tickets[ticketNo];
-        // fromAllTix.isPaid = true;
-        Ticket memory fromAllTix = s_tickets[ticketNo];
-        delete s_tickets[ticketNo];
-
-        s_tickets.push(
-            Ticket(
-                fromAllTix.ticketNumber,
-                fromAllTix.location,
-                fromAllTix.carNumberPlate,
-                fromAllTix.price,
-                fromAllTix.issuedAt,
-                true
-            )
-        );
+        Ticket storage fromAllTix = s_tickets[ticketNo];
+        fromAllTix.isPaid = true;
 
         // Change in the vehicleTicket isPaid to true
         s_vehicleTickets[carPlate][ticketNo].isPaid = true;
